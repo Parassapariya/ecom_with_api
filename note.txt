@@ -1,0 +1,67 @@
+1) 
+-> create npm init,folder(controllers,models,routes,config,middlewares),index.js
+
+2)
+->some pakege install like express,mongoose,dotenv,body-parser
+
+3)
+->in index.js we implement express with app and make port in .env file and we can use in index.js 
+
+4)
+->make connection of mongoose in config  file and exprots after in index.js and connection() call that..
+
+5)
+->connection successfully we can make a model schema and exports into controllers
+
+6)
+->controller make and use model after we perfom create, login and its export into routes
+
+7)we make a route and controller use in express.route() ex..
+    route.post('/registration',createUser);
+->after make and exports it..
+
+8)
+->index.js we can use it route exx.
+    app.use("/api/user/",userroute);
+->use also body-parser
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({extended:false}));
+
+9)
+->we can make a password bcrypt of users  show install (npm i bcrypt) and use into the models
+
+10)
+->inthis model we can use schema.pre methods ex.
+    userSchema.pre('save',async function (next){
+        const salt = await bcrypt.genSaltSync(10);  //use to gunrate salt of password
+        this.password = await bcrypt.hash(this.password ,salt);  //use to assign password field
+    });
+
+11)
+->we can login show bcrypt password excrypt in this model also ex..
+    userSchema.methods.isPasswordMatch = async function(enterpass){
+        return await bcrypt.compare(enterpass,this.password)//return excrypt password
+    }
+->we can use this method into the login controller
+
+12)
+->  use into the controller check login conditions
+    if (finduser && (await finduser.isPasswordMatch(password))) 
+
+13)
+-> if login success show we can gunrate its user token we can use (npm i jsonwebtoken) 
+->into the config file we can make a new file into this token and exports it
+    const gurateToken = (id)=>{
+        return token.sign({id},process.env.SECRET_KEY,{ expiresIn:"3d" });
+    }
+
+14)
+->after we can check if user login show make its token ex.
+     res.json({
+            _id: finduser?._id,
+            FirstName: finduser?.FirstName,
+            LastName: finduser?.LastName,
+            email: finduser?.email,
+            mobile: finduser?.mobile,
+            token:gurateToken(finduser?._id),  //token make of this _id
+        });
