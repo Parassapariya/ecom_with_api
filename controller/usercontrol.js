@@ -2,6 +2,7 @@ const expressAsyncHandler = require("express-async-handler");
 const { gurateToken } = require("../config/jwtToken");
 const User = require("../models/user");
 
+//create user
 const createUser = async(req,res)=>{
     const email = req.body.email;
     const findUser = await User.findOne({email:email});
@@ -23,11 +24,11 @@ const loginuser = async(req,res)=>{
     if (finduser && (await finduser.isPasswordMatch(password))) {
         res.json({
             _id: finduser?._id,
-            FirstName: finduser?.FirstName,
-            LastName: finduser?.LastName,
-            email: finduser?.email,
-            mobile: finduser?.mobile,
-            token:gurateToken(finduser?._id),
+            FirstName: finduser.FirstName,
+            LastName: finduser.LastName,
+            email: finduser.email,
+            mobile: finduser.mobile,
+            token:gurateToken(finduser._id),
         });
     } else {
         res.json({
@@ -91,11 +92,11 @@ const deluser = async(req,res)=>{
 //Update user
 const Updateuser = expressAsyncHandler(async(req,res)=>{
     // console.log(req.data._id);
-    const { _id }  = req.data;
+    const { id }  = req.params;
     try {
         let Updateuser = await User.findByIdAndUpdate(
             {
-                _id
+                _id:id
             },
             {
                 FirstName:req.body.FirstName,
@@ -119,6 +120,7 @@ const Updateuser = expressAsyncHandler(async(req,res)=>{
    
 });
 
+//user block
 const Blockuser = expressAsyncHandler(async(req,res)=>{
     const { id }  = req.params;
     try {
@@ -143,6 +145,8 @@ const Blockuser = expressAsyncHandler(async(req,res)=>{
         })
     }
 });
+
+//user unblock
 const Unblockuser = expressAsyncHandler(async(req,res)=>{
     const { id }  = req.params;
     try {
@@ -167,4 +171,6 @@ const Unblockuser = expressAsyncHandler(async(req,res)=>{
         })
     }
 });
+
+
 module.exports = {createUser , loginuser, alluser, Oneuser, deluser , Updateuser ,Blockuser, Unblockuser}

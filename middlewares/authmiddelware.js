@@ -7,6 +7,8 @@ let authmiddleware = asynchandler(async(req,res,next)=>{
     try {
         if (req.headers.authorization.startsWith("Bearer")) {
             tokan = req.headers.authorization.split(" ")[1];
+            // let test = req.headers.authorization.startsWith("Bearer");
+            // console.log(test);
             try {
                 if (tokan) {
                     const decoded = jwt.verify(tokan,process.env.SECRET_KEY);
@@ -22,7 +24,7 @@ let authmiddleware = asynchandler(async(req,res,next)=>{
         }
     } catch (error) {
         res.json({
-            msg : "error",
+            msg : "Please Provide Token!!!!!!!!!!",
         })
     }
 });

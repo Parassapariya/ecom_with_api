@@ -65,3 +65,49 @@
             mobile: finduser?.mobile,
             token:gurateToken(finduser?._id),  //token make of this _id
         });
+15)
+->make a user getall, getone, deleteone, updateone api and its controller and routes
+
+16)
+->we can use in middlewares async-hendler for async task AND its npm pakege install express-async-handler.
+->make a middlewares for check is token varify show its work otherwise not work in api.
+->we can use jwt token.
+          let tokan;
+            try {
+                if (req.headers.authorization.startsWith("Bearer")) {
+                    tokan = req.headers.authorization.split(" ")[1];
+                    // let test = req.headers.authorization.startsWith("Bearer");
+                    // console.log(test);
+                    try {
+                        if (tokan) {
+                            const decoded = jwt.verify(tokan,process.env.SECRET_KEY);
+                            let data = await user.findById({_id:decoded.id});
+                            req.data = data;
+                            next();
+                        } 
+                    } catch (error) {
+                        res.json({
+                            msg : "not authorization",
+                        })
+                    }
+                }
+            } catch (error) {
+                res.json({
+                    msg : "error",
+                })
+            }
+
+17)
+-> its middlewares impliment into the routes 
+
+18)
+-> one more make middlewares for isadmin or not check for api update,block and unbloked user opration.
+ if its admin show perform all task otherwise not use
+    let data = await user.findOne({email:req.data.email});
+    if (data.Role !== "admin") {
+        res.json({
+            msg : "you are not admin"
+        })
+    } else {
+        next();
+    }

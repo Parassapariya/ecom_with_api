@@ -13,7 +13,7 @@ route.get('/:id', authmiddleware, isadmin ,Oneuser);
 
 route.delete('/:id',deluser);
 
-route.put('/edit-data',authmiddleware, Updateuser);
+route.put('/edit-data/:id',authmiddleware, isadmin, Updateuser);
 
 route.put('/Block-user/:id',authmiddleware,isadmin, Blockuser);
 
