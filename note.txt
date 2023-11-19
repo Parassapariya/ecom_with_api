@@ -111,3 +111,105 @@
     } else {
         next();
     }
+
+
+19)
+->you make a utils folder and make a validationmongooseid check that
+    const validatemongoid = (id)=>{
+        const isvalid = mongoose.Types.ObjectId.isValid(id);
+        // if (!isvalid) throw new Error("This Id is not valid or not found");
+        if (!isvalid) {
+            console.log("This Id is not valid or not found");
+        }
+    }
+
+20)
+->we make a refressTokan in config file
+    const refressToken = (id)=>{
+        return token.sign({id},process.env.SECRET_KEY,{ expiresIn:"3d" });
+    }
+
+21)
+-> add cookie-parser and use into the index app.use(cookieparser())
+-> afteruse into refressTokan into the login system 
+     const refreshTokan = refressToken(finduser._id);  //gunrate refreshTokan
+        const updateuser = await User.findByIdAndUpdate(  //update refreshTokan in user id
+            {
+                _id: finduser._id
+            },
+            {
+                refreshTokan: refreshTokan
+            },
+            {
+                new: true
+            }
+        );
+    res.cookie("refreshTokan", refreshTokan, {  //name of cookie and maxage of cookie in this res
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+    })
+
+22)
+->  refress Tokan Hendler , refreshTokan gunrated and cookie check , 
+    if available show find its user and jwt varify that tokan
+            const cookie = req.cookies;
+            if (!cookie.refreshTokan) {
+                res.json({
+                    msg: "Not Tokan Avilable In Cookie!!",
+                    success: false,
+                })
+            } else {
+                let cookietokan = cookie.refreshTokan;
+                let result = await User.findOne({
+                    refreshTokan: cookietokan
+                });
+                if (result) {
+                    jwt.verify(cookietokan, process.env.SECRET_KEY, (err, decoded) => {
+                        // console.log(decoded);
+                        if (err || result.id !== decoded.id) {
+                            res.json({
+                                msg: "There Is Something Wrong In RefressTokan!!",
+                                success: false,
+                            })
+                        } else {
+                            let aceesTokan = gurateToken(result._id)
+                            res.json({
+                                aceesTokan
+                            })
+                        }
+                    })
+                } else {
+                    res.json({
+                        msg: "Not Tokan Avilable In Db!!",
+                        success: false,
+                    })
+                }
+            }
+
+23)
+->log out that user and cookie clear in controller and upadte refreshTokan clear in logout
+            let refreshTokan = cookie.refreshTokan;
+            let result = await User.findOne({
+                refreshTokan: refreshTokan
+            });
+            if (!result) {
+                res.clearCookie("refreshTokan", {
+                    httpOnly: true,
+                    secure: true
+                });
+                return res.sendStatus(204);
+            } 
+                await User.findByIdAndUpdate(
+                    {
+                        _id: result.id
+                    },
+                    {
+                        refreshTokan: ""
+                    }
+                );
+                res.clearCookie("refreshTokan", {
+                    httpOnly: true,
+                    secure: true
+                });
+                return res.sendStatus(204);
+       

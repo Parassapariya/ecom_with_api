@@ -7,8 +7,6 @@ const cookieParser = require("cookie-parser");
 const express = require("express");
 const jwt = require("jsonwebtoken");
 
-
-
 //create user
 const createUser = async (req, res) => {
     const email = req.body.email;
@@ -65,7 +63,6 @@ const loginuser = async (req, res) => {
 //refress Tokan Hendler
 const refreshandler = expressAsyncHandler(async (req, res) => {
     const cookie = req.cookies;
-    // console.log(cookie);
     if (!cookie.refreshTokan) {
         res.json({
             msg: "Not Tokan Avilable In Cookie!!",
