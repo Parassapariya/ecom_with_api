@@ -211,4 +211,65 @@
                     secure: true
                 });
                 return res.sendStatus(204);
-       
+
+24) 
+-> create model of product schema and after its export into the controller make product controller
+
+25)
+->in this controller we can make a create, getone , allget , delete, update , product in thisa controller and after 
+    export it ...
+
+26)
+->we create a route product and impliment into the index.js and import the product controller in this route
+    like(create,get,delete)
+
+27)
+->after all set we also impliment in route middlewares so auth, isadmin we can use..
+
+28)
+->we can use the slugify npm package for the slug name blank space and copy that product name into the slug..
+
+29)
+->after we can use the req.query in get all product like a sort,pagination,compare,filed in  
+this section we have filtering of our product
+
+    1)comperision
+    ->  let newquery = JSON.stringify(query);
+        newquery = newquery.replace(/\b(gte|gt|lt|lte)\b/g , (match) => `$${match}`)
+        let finalquery = Product.find(JSON.parse(newquery));
+    
+    2)sort
+    ->  //Shorting
+        if (req.query.sort) {
+            let sortby = req.query.sort.split(',').join(" ");
+            console.log("Sort:"+sortby);
+            finalquery = finalquery.sort(sortby); //finalquery is query find 
+        }else{
+            finalquery = finalquery.sort("-createdAt");
+        }
+
+    3)fileds show 
+    ->//field
+        if (req.query.fields) {
+            let fieldsby = req.query.fields.split(',').join(" ");
+            console.log("fileds:"+fieldsby);
+            finalquery = finalquery.select(fieldsby);
+        }else{
+            finalquery = finalquery.select("-__v");
+        }
+
+    4)pagination
+    ->  const page = req.query.page;
+        const limit = req.query.limit;
+        const skip = (page-1) * limit;
+        finalquery = finalquery.skip(skip).limit(limit);
+        if (req.query.page) {
+            const pdcount = await Product.countDocuments();
+            if (skip >= pdcount) {
+                res.json({
+                    msg:"This page is not available"
+                })
+            }
+        }
+
+
