@@ -73,9 +73,10 @@ const Getallproduct = asynchandler(async (req, res) => {
         let query = {...req.query};
         let excludefilds = ["page","sort","limit","fields"];
         excludefilds.forEach((er) => delete query[er])
+
         let newquery = JSON.stringify(query);
         newquery = newquery.replace(/\b(gte|gt|lt|lte)\b/g , (match) => `$${match}`)
-        console.log(newquery);
+        console.log(req.query);
       
         let finalquery = Product.find(JSON.parse(newquery));
            
