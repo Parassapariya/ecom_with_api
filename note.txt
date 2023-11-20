@@ -117,7 +117,6 @@
 ->you make a utils folder and make a validationmongooseid check that
     const validatemongoid = (id)=>{
         const isvalid = mongoose.Types.ObjectId.isValid(id);
-        // if (!isvalid) throw new Error("This Id is not valid or not found");
         if (!isvalid) {
             console.log("This Id is not valid or not found");
         }

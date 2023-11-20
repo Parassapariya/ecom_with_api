@@ -5,16 +5,20 @@ const dbconnect = require('./config/Dbconnect');
 const dotenv = require('dotenv').config();
 const PORT = process.env.PORT || 4000
 const userroute = require('./routes/userroute');
+const productroute = require('./routes/Productroute');
 const bodyParser = require('body-parser');
+const morgan = require('morgan')
 const cookieParser = require('cookie-parser');
 
 
 dbconnect();
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(cookieParser());
 
 app.use("/api/user/",userroute);
+app.use("/api/product/",productroute);
 
 app.listen(PORT,()=>{
     console.log("server is running 5000");
