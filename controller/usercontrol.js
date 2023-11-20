@@ -274,5 +274,18 @@ const Unblockuser = expressAsyncHandler(async (req, res) => {
     }
 });
 
+//change password
+const changepassword = expressAsyncHandler(async(req,res)=>{
+    let {_id} = req.data;
+    let password = req.body.password;
+    const user = await User.findById({_id:_id});
+    if (password) {
+        user.password = password;
+        const updatepassword = await user.save();
+        res.json(updatepassword)
+    }else{
+        res.json(user);
+    }
+});
 
-module.exports = { createUser, loginuser, alluser, Oneuser, deluser, Updateuser, Blockuser, Unblockuser, refreshandler, logout }
+module.exports = { createUser, loginuser, alluser, Oneuser, deluser, Updateuser, Blockuser, Unblockuser, refreshandler, logout, changepassword }
