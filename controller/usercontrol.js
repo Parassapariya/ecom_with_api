@@ -156,7 +156,7 @@ const Oneuser = async (req, res) => {
     const { id } = req.params;
     validatemongoid(id);
     try {
-        let Oneuser = await User.findById({ _id: id });
+        let Oneuser = await User.findById({ _id: id }).populate('');
         res.json({
             Oneuser,
         })
