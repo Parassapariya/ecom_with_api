@@ -45,7 +45,7 @@ const loginuser = async (req, res) => {
     })
     if (finduser && (await finduser.isPasswordMatch(password))) {
         res.json({
-            _id: finduser?._id,
+            _id: finduser._id,
             FirstName: finduser.FirstName,
             LastName: finduser.LastName,
             email: finduser.email,

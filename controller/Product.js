@@ -3,7 +3,7 @@ const Product = require("../models/Product");
 const asynchandler = require("express-async-handler");
 const { query } = require("express");
 const User = require("../models/user");
-
+const {cloudinaryimage} = require("../utils/cloudinary");
 
 const createproduct = asynchandler(async (req, res) => {
     try {
@@ -71,49 +71,49 @@ const DeletePro = asynchandler(async (req, res) => {
 const Getallproduct = asynchandler(async (req, res) => {
     try {
         //filtering
-        let query = {...req.query};
-        let excludefilds = ["page","sort","limit","fields"];
+        let query = { ...req.query };
+        let excludefilds = ["page", "sort", "limit", "fields"];
         excludefilds.forEach((er) => delete query[er])
 
         let newquery = JSON.stringify(query);
-        newquery = newquery.replace(/\b(gte|gt|lt|lte)\b/g , (match) => `$${match}`)
+        newquery = newquery.replace(/\b(gte|gt|lt|lte)\b/g, (match) => `$${match}`)
         console.log(req.query);
-      
+
         let finalquery = Product.find(JSON.parse(newquery));
-           
-     
+
+
         //Shorting
         if (req.query.sort) {
             let sortby = req.query.sort.split(',').join(" ");
-            console.log("Sort:"+sortby);
+            console.log("Sort:" + sortby);
             finalquery = finalquery.sort(sortby);
-        }else{
+        } else {
             finalquery = finalquery.sort("-createdAt");
         }
 
         //field
         if (req.query.fields) {
             let fieldsby = req.query.fields.split(',').join(" ");
-            console.log("fileds:"+fieldsby);
+            console.log("fileds:" + fieldsby);
             finalquery = finalquery.select(fieldsby);
-        }else{
+        } else {
             finalquery = finalquery.select("-__v");
         }
 
         //pagination 
         const page = req.query.page;
         const limit = req.query.limit;
-        const skip = (page-1) * limit;
+        const skip = (page - 1) * limit;
         finalquery = finalquery.skip(skip).limit(limit);
         if (req.query.page) {
             const pdcount = await Product.countDocuments();
             if (skip >= pdcount) {
                 res.json({
-                    msg:"This page is not available"
+                    msg: "This page is not available"
                 })
             }
         }
-        console.log(page,limit,skip);
+        console.log(page, limit, skip);
 
         const result = await finalquery;
         if (result) {
@@ -147,40 +147,69 @@ const Oneproduct = asynchandler(async (req, res) => {
     }
 });
 
-const addwishlist = asynchandler(async(req,res)=>{
-    const {id} = req.data;
-    const {prodid} = req.body;
+const addwishlist = asynchandler(async (req, res) => {
+    const { id } = req.data;
+    const { prodid } = req.body;
     try {
-        const user = await User.findById({_id:id});
+        const user = await User.findById({ _id: id });
         const alredyadded = user.Wishlist.find((id) => id.toString() === prodid);
-        
+
         if (alredyadded) {
             let userdata = await User.findByIdAndUpdate(
-                {_id:user.id},
+                { _id: user.id },
                 {
-                    $pull: {Wishlist : prodid},
+                    $pull: { Wishlist: prodid },
                 },
                 {
-                    new:true
+                    new: true
                 });
-                res.json(userdata)
+            res.json(userdata)
         }
-        else
-        {
+        else {
             let userdata = await User.findByIdAndUpdate(
-                {_id:user.id},
+                { _id: user.id },
                 {
-                    $push: {Wishlist : prodid},
+                    $push: { Wishlist: prodid },
                 },
                 {
-                    new:true
+                    new: true
                 });
-                res.json(userdata)
+            res.json(userdata)
         }
     } catch (error) {
         throw new Error(error)
     }
 });
 
+const uplordimag = asynchandler(async (req, res) => {
+    const  id  = req.params.id;
+    //console.log(id);
+    try {
+        const upload = (path) => cloudinaryimage(path, "images");
+        
+        const url = [];
+        const files = req.files;
+        
+        for (const file of files) {
+            
+            const { path } = file;
+            const newpath = await upload(path);
+            url.push(newpath);
+        }
+        const findprodcut = await Product.findByIdAndUpdate({ _id: id },
+            {
+                Images: url.map((file) => {
+                    return file;
+                })
+            }, { new: true });
+        res.json(findprodcut);
 
-module.exports = { createproduct, Getallproduct, Oneproduct, UpdatePro ,DeletePro ,addwishlist }
+    } catch (error) {
+        console.log(error)
+res.json({
+    msg:"please you wrong!!"
+})
+    }
+});
+
+module.exports = { createproduct, Getallproduct, Oneproduct, UpdatePro, DeletePro, addwishlist, uplordimag }

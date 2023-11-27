@@ -15,13 +15,14 @@ const morgan = require('morgan')
 const cookieParser = require('cookie-parser');
 const { errorHandler, NotFound } = require('./middlewares/errorHandler');
 const asynchandler = require('express-async-handler');
-
+const fileupload = require('express-fileupload');
 
 dbconnect();
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(cookieParser());
+app.use(fileupload({useTempFiles: true}))
 
 app.use("/api/user/",userroute);
 app.use("/api/product/",productroute);

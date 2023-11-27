@@ -42,9 +42,7 @@ var ProductSchema = new mongoose.Schema({
         type:Number,
         default:0,
     },
-    Images:{
-        type:Array,
-    },
+    Images:[],
     color:{
         // type:mongoose.Schema.Types.ObjectId,
         // ref:"Color"
