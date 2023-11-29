@@ -1,11 +1,15 @@
 const expressAsyncHandler = require("express-async-handler");
 const { gurateToken } = require("../config/jwtToken");
 const User = require("../models/user");
+
 const { validatemongoid } = require("../utils/validatemongodbid");
 const { refressToken } = require("../config/refressTokan");
 const cookieParser = require("cookie-parser");
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const cartModel = require("../models/cartModel");
+const Product = require("../models/Product");
+
 
 //create user
 const createUser = async (req, res) => {
@@ -348,6 +352,68 @@ const getWishlist = expressAsyncHandler(async(req,res)=>{
     }
 })
 
+const saveAddress = expressAsyncHandler(async(req,res)=>{
+    try {
+        const id = req.data;
+        const findUser = await User.findOne({ _id: id });
+
+        if (findUser) {
+            const UpdateAddress = await User.findByIdAndUpdate({_id:findUser.id},{
+                Address:req.body.Address,
+            },{new:true}).populate("Wishlist");
+            res.json(UpdateAddress);
+        } else {
+            res.json({
+                msg: "Please Login After You Can Save Address",
+                success: false
+            })
+        }
+    } catch (error) {
+        res.json({
+            msg: "User Not Found!!!",
+            success: false,
+        })
+    }
+});
+
+const UserCart = expressAsyncHandler(async(req,res)=>{
+    const { cart } = req.body;
+    const {_id} = req.data;
+    try {
+        let Productsarray = [];
+        const user = await User.findById({_id:_id});
+        const alreadyexist = await cartModel.findOne({orderby:user._id});
+        if (alreadyexist) {
+            alreadyexist.remove();
+        }
+        for (let i = 0; i < cart.length; i++) {
+            let object = {};
+            object.product = cart[i]._id;
+            object.count = cart[i].count;
+            object.color = cart[i].color;
+            let getprice = await Product.findById({_id:cart[i]._id}).select("Price").exec();
+            object.Price = getprice.Price;
+            Productsarray.push(object);
+        }
+        let total = 0;
+        for (let i = 0; i < Productsarray.length; i++) {
+           total += Productsarray[i].Price * Productsarray[i].count;
+        }
+        let cartinsert = await new cartModel({
+            Products:Productsarray,
+            cartTotal:total,
+            orderby:user._id,
+        }).save();
+        res.json({
+            cartinsert
+        })
+    } catch (error) {
+        res.json({
+            msg: "User Not Found!!!",
+            success: false,
+        })
+    }
+});
 
 module.exports = { 
     createUser, 
@@ -362,5 +428,7 @@ module.exports = {
     logout, 
     changepassword ,
     Adminloginuser,
-    getWishlist
+    getWishlist,
+    saveAddress,
+    UserCart
 }
