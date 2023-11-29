@@ -2,6 +2,8 @@ const blog = require("../models/blog");
 const User = require("../models/user");
 const asynchandler =  require("express-async-handler");
 const validatemongose = require("../utils/validatemongodbid");
+const { cloudinaryUploadImg } = require("../utils/cloudinary");
+const fs = require("fs");
 
 const createBlog = asynchandler(async(req,res)=>{
     try {
@@ -166,4 +168,32 @@ const DishikeBlog = asynchandler(async(req,res)=>{
     }
 });
 
-module.exports = {createBlog , UpdateBlog, GetBlog, GetAllBlog , DeleteBlog , LikeBlog , DishikeBlog}
+
+const uplordblogimag = asynchandler(async (req, res) => {
+    const id = req.params.id;
+    try {
+        const uploader = (path) => cloudinaryUploadImg(path, "images");
+        const urls = [];
+        const files = req.files;
+        for (const file of files) {
+            const { path } = file;
+            const newpath = await uploader(path);
+            //console.log(newpath);
+            urls.push(newpath);
+            fs.unlinkSync(path);
+        }
+        const findprodcut = await blog.findByIdAndUpdate({ _id: id },
+            {
+                Image: urls.map((file) => {
+                    return file;
+                })
+            }, { new: true });
+        res.json(findprodcut);
+        res.json(images);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
+
+module.exports = {createBlog , UpdateBlog, GetBlog, GetAllBlog , DeleteBlog , LikeBlog , DishikeBlog , uplordblogimag}

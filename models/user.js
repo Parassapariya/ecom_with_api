@@ -47,7 +47,7 @@ var userSchema = new mongoose.Schema({
     }],
     Wishlist:[{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"Wishlist",
+        ref:"Product",
     }],
     refreshTokan:{
         type:String,

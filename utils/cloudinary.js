@@ -7,15 +7,26 @@ cloudinary.config({
     api_secret: "koNdY2qyfuc8GUerFAzScyVMBfo"
 })
 
-const cloudinaryimage = async(fileupload)=>{
-    //console.log(fileuplaod)
+const cloudinaryUploadImg = async(fileToUploads) => {
 
-     const data = await   cloudinary.uploader.upload(fileupload.path, {
-        public_id: `${Date.now()}`, 
-        resource_type: "auto"
-    })
-     console.log(data)
+    console.log(fileToUploads);
     
-};
+    return new Promise((resolve) => {
+        cloudinary.uploader
+        .upload(fileToUploads)
+        .then(result=> resolve(
+            {
+              url: result.secure_url,
+              
+            },
+            {
+              resource_type: "auto",
+            }
+          ));
+    //   cloudinary.uploader.upload(fileToUploads, (result) => {
+       
+    //   });
+    });
+  };
 
-module.exports = {cloudinaryimage}
+module.exports = {cloudinaryUploadImg}

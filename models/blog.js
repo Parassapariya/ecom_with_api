@@ -34,10 +34,7 @@ var BlogSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     }],
-    Image:{
-        type:String,
-        default:"https://tse1.mm.bing.net/th?id=OIP.a5YOm_1N-oe-O025Jw4PTQAAAA&pid=Api&rs=1&c=1&qlt=95&w=159&h=106",
-    },
+    Image:[],
     Author:{
         type:String,
         default:"Admin"

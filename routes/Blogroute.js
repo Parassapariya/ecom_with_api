@@ -1,9 +1,12 @@
 const express = require("express");
 const route = express.Router();
 const { authmiddleware , isadmin } = require('../middlewares/authmiddelware');
-const { createBlog, UpdateBlog, GetBlog, GetAllBlog, DeleteBlog, LikeBlog, DishikeBlog } =  require("../controller/Blog");
+const { uploadPhoto ,productImgResize, blogImgResize} = require("../middlewares/uplordimages");
+const { createBlog, UpdateBlog, GetBlog, GetAllBlog, DeleteBlog, LikeBlog, DishikeBlog, uplordblogimag } =  require("../controller/Blog");
 
 route.post("/create/",authmiddleware,isadmin,createBlog);
+
+route.put("/uplord/:id",authmiddleware, isadmin, uploadPhoto.array('images',10), blogImgResize,  uplordblogimag )
 
 route.put("/Update/:id",authmiddleware,isadmin,UpdateBlog);
 

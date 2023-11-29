@@ -2,12 +2,12 @@ const express = require("express");
 const route = express.Router();
 const { authmiddleware , isadmin } = require('../middlewares/authmiddelware');
 const {createproduct , Getallproduct , Oneproduct, UpdatePro, DeletePro, addwishlist, uplordimag} = require("../controller/Product");
-const { uplordimage ,primageresize} = require("../middlewares/uplordimages");
+const { uploadPhoto ,productImgResize} = require("../middlewares/uplordimages");
 
 
 route.post("/create",authmiddleware,isadmin,createproduct);
 
-route.put("/uplord/:id",authmiddleware, isadmin, uplordimage.array('images',10), primageresize,  uplordimag )
+route.put("/uplord/:id",authmiddleware, isadmin, uploadPhoto.array('images',10), productImgResize,  uplordimag )
 
 route.get("/allproduct",Getallproduct);
 

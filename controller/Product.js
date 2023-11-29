@@ -3,7 +3,8 @@ const Product = require("../models/Product");
 const asynchandler = require("express-async-handler");
 const { query } = require("express");
 const User = require("../models/user");
-const {cloudinaryimage} = require("../utils/cloudinary");
+const { cloudinaryUploadImg } = require("../utils/cloudinary");
+const fs = require("fs")
 
 const createproduct = asynchandler(async (req, res) => {
     try {
@@ -182,34 +183,31 @@ const addwishlist = asynchandler(async (req, res) => {
 });
 
 const uplordimag = asynchandler(async (req, res) => {
-    const  id  = req.params.id;
-    //console.log(id);
+    const id = req.params.id;
     try {
-        const upload = (path) => cloudinaryimage(path, "images");
-        
-        const url = [];
+        const uploader = (path) => cloudinaryUploadImg(path, "images");
+        const urls = [];
         const files = req.files;
-        
         for (const file of files) {
-            
             const { path } = file;
-            const newpath = await upload(path);
-            url.push(newpath);
+            const newpath = await uploader(path);
+            //console.log(newpath);
+            urls.push(newpath);
+            fs.unlinkSync(path);
         }
         const findprodcut = await Product.findByIdAndUpdate({ _id: id },
             {
-                Images: url.map((file) => {
+                Images: urls.map((file) => {
                     return file;
                 })
             }, { new: true });
         res.json(findprodcut);
-
+        res.json(images);
     } catch (error) {
-        console.log(error)
-res.json({
-    msg:"please you wrong!!"
-})
+        throw new Error(error);
     }
 });
+
+
 
 module.exports = { createproduct, Getallproduct, Oneproduct, UpdatePro, DeletePro, addwishlist, uplordimag }

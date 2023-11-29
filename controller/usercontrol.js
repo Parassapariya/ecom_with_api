@@ -60,6 +60,50 @@ const loginuser = async (req, res) => {
     }
 };
 
+//Admin Login controler
+const Adminloginuser = async (req, res) => {
+    const { email, password } = req.body;
+    const findAdmin = await User.findOne({ email: email });
+    if(findAdmin.Role !== "admin") 
+    {
+        res.json({
+            msg: "You Are Not Admin",
+            success: false,
+        })
+    }
+    const refreshTokan = refressToken(findAdmin._id);
+    const updateuser = await User.findByIdAndUpdate(
+        {
+            _id: findAdmin._id
+        },
+        {
+            refreshTokan: refreshTokan
+        },
+        {
+            new: true
+        }
+    );
+    res.cookie("refreshTokan", refreshTokan, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+    })
+    if (findAdmin && (await findAdmin.isPasswordMatch(password))) {
+        res.json({
+            _id: findAdmin._id,
+            FirstName: findAdmin.FirstName,
+            LastName: findAdmin.LastName,
+            email: findAdmin.email,
+            mobile: findAdmin.mobile,
+            token: gurateToken(findAdmin._id),
+        });
+    } else {
+        res.json({
+            msg: "please enter correct email or password",
+            success: false,
+        })
+    }
+};
+
 //refress Tokan Hendler
 const refreshandler = expressAsyncHandler(async (req, res) => {
     const cookie = req.cookies;
@@ -288,4 +332,35 @@ const changepassword = expressAsyncHandler(async(req,res)=>{
     }
 });
 
-module.exports = { createUser, loginuser, alluser, Oneuser, deluser, Updateuser, Blockuser, Unblockuser, refreshandler, logout, changepassword }
+const getWishlist = expressAsyncHandler(async(req,res)=>{
+   
+    try {
+        const {_id} = req.data;
+        let result = await User.findById({_id:_id}).populate("Wishlist");
+        res.json({
+           result
+        })
+    } catch (error) {
+        res.json({
+            msg: "User Not Found!!!",
+            success: false,
+        })
+    }
+})
+
+
+module.exports = { 
+    createUser, 
+    loginuser, 
+    alluser, 
+    Oneuser, 
+    deluser, 
+    Updateuser, 
+    Blockuser, 
+    Unblockuser, 
+    refreshandler, 
+    logout, 
+    changepassword ,
+    Adminloginuser,
+    getWishlist
+}
