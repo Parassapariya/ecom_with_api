@@ -1,6 +1,6 @@
 const express = require('express');
 const { authmiddleware , isadmin } = require('../middlewares/authmiddelware');
-const { createUser, loginuser, deluser, alluser, Oneuser, Updateuser, Blockuser, Unblockuser, refreshandler, logout, changepassword, Adminloginuser, getWishlist, saveAddress, UserCart } = require('../controller/usercontrol');
+const { createUser, loginuser, deluser, alluser, Oneuser, Updateuser, Blockuser, Unblockuser, refreshandler, logout, changepassword, Adminloginuser, getWishlist, saveAddress, UserCart, getUserCart, emptycart } = require('../controller/usercontrol');
 const route = express.Router();
 
 route.post('/registration',createUser);
@@ -16,6 +16,10 @@ route.get('/wishlist',authmiddleware,getWishlist);
 route.post('/address',authmiddleware,saveAddress);
 
 route.post('/usercart',authmiddleware,UserCart);
+
+route.get('/getcart',authmiddleware,getUserCart);
+
+route.delete('/emptycart',authmiddleware,emptycart);
 
 route.get('/alluser', alluser);
 

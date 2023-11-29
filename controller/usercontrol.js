@@ -388,7 +388,7 @@ const UserCart = expressAsyncHandler(async(req,res)=>{
         }
         for (let i = 0; i < cart.length; i++) {
             let object = {};
-            object.product = cart[i]._id;
+            object.Product = cart[i]._id;
             object.count = cart[i].count;
             object.color = cart[i].color;
             let getprice = await Product.findById({_id:cart[i]._id}).select("Price").exec();
@@ -404,12 +404,49 @@ const UserCart = expressAsyncHandler(async(req,res)=>{
             cartTotal:total,
             orderby:user._id,
         }).save();
-        res.json({
-            cartinsert
-        })
+        res.json(cartinsert)
     } catch (error) {
         res.json({
             msg: "User Not Found!!!",
+            success: false,
+        })
+    }
+});
+
+const getUserCart = expressAsyncHandler(async(req,res)=>{
+    const {_id} = req.data;
+    //console.log(_id);
+    try {
+        const getcartdata = await cartModel.findOne({orderby:_id})
+        .populate("Products.Product");
+        //console.log(getcartdata);
+        if (getcartdata) {
+            res.json(getcartdata)
+        } else {
+            res.json({
+                msg: "No Cart Item Found Found!!!",
+                success: false,
+            })
+        }
+    } catch (error) {
+        res.json({
+            msg: "Somthing Wrong Found!!!",
+            success: false,
+        })
+    }
+});
+
+const emptycart = expressAsyncHandler(async(req,res)=>{
+    const {_id} = req.data;
+    try {
+        const getcartdata = await cartModel.findOneAndDelete({orderby:_id})
+        res.json({
+            msg: "Cart Item Deleted",
+            success: false,
+        })
+    } catch (error) {
+        res.json({
+            msg: "No Cart Item Found Found!!!",
             success: false,
         })
     }
@@ -430,5 +467,7 @@ module.exports = {
     Adminloginuser,
     getWishlist,
     saveAddress,
-    UserCart
+    UserCart,
+    getUserCart,
+    emptycart
 }
