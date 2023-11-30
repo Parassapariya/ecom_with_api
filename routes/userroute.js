@@ -1,6 +1,6 @@
 const express = require('express');
 const { authmiddleware , isadmin } = require('../middlewares/authmiddelware');
-const { createUser, loginuser, deluser, alluser, Oneuser, Updateuser, Blockuser, Unblockuser, refreshandler, logout, changepassword, Adminloginuser, getWishlist, saveAddress, UserCart, getUserCart, emptycart } = require('../controller/usercontrol');
+const { createUser, loginuser, deluser, alluser, Oneuser, Updateuser, Blockuser, Unblockuser, refreshandler, logout, changepassword, Adminloginuser, getWishlist, saveAddress, UserCart, getUserCart, emptycart, ApplyCoupan, createOrder, getOrder, updateorderstatus } = require('../controller/usercontrol');
 const route = express.Router();
 
 route.post('/registration',createUser);
@@ -20,6 +20,14 @@ route.post('/usercart',authmiddleware,UserCart);
 route.get('/getcart',authmiddleware,getUserCart);
 
 route.delete('/emptycart',authmiddleware,emptycart);
+
+route.post('/Cart/ApplyCoupan',authmiddleware,ApplyCoupan);
+
+route.post('/Cashondil',authmiddleware,createOrder);
+
+route.get('/cart/getorder',authmiddleware,getOrder);
+
+route.put('/cart/orderstatus-update/:id',authmiddleware,updateorderstatus);
 
 route.get('/alluser', alluser);
 
